@@ -1,11 +1,20 @@
 BCGcalc-NEWS
 ================
 <Erik.Leppo@tetratech.com>
-2024-01-09 10:27:29.176497
+2024-01-11 13:15:28.879966
 
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
 
-    #> Last Update: 2024-01-09 10:27:29.229061
+    #> Last Update: 2024-01-11 13:15:28.933859
+
+# BCGcalc 2.0.0.9135 (2024-01-11)
+
+- refactor: Update NM BCG, drop percent max ffg from L2 and L4 per
+  documentation
+
+# BCGcalc 2.0.0.9134 (2024-01-11)
+
+- refactor: Update NM BCG Index_Name and Index_Class in Rules.xlsx
 
 # BCGcalc 2.0.0.9133 (2024-01-09)
 
