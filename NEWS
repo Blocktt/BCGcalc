@@ -1,11 +1,43 @@
 BCGcalc-NEWS
 ================
 <Erik.Leppo@tetratech.com>
-2024-01-11 13:15:28.879966
+2024-02-27 12:12:52.808604
 
 <!-- NEWS.md is generated from NEWS.Rmd. Please edit that file -->
 
-    #> Last Update: 2024-01-11 13:15:28.933859
+    #> Last Update: 2024-02-27 12:12:52.880878
+
+# BCGcalc 2.0.0.9140 (2024-02-27)
+
+- feature: Add new template for new metrics, models, and rules
+- fix: Update package documenation per roxygen2
+
+# BCGcalc 2.0.0.9139 (2024-02-06)
+
+- refactor: Shiny app file builder generate class parameters, Issue \#89
+  - Add shinyalert for more than 500 records
+  - `nhdplustools` and `StreamCatTools` timeout issues with too many
+    records
+- fix: Shiny app calculation of BioMonTools::metric.scores,
+  leppott/BioMonTools#103
+  - Affected BDI calculation, checked and no other instances
+- fix: Update package documenation per roxygen2 (since 7.0.0)
+
+# BCGcalc 2.0.0.9138 (2024-02-01)
+
+- fix: Shiny app fuzzy model not working, change community reference
+  - Also fixed thermal metrics for status message
+
+# BCGcalc 2.0.0.9137 (2024-02-01)
+
+- fix: Update naming scheme for BCG calculation in Shiny app, Issue \#87
+  - Add “\_” prefix to Results.
+
+# BCGcalc 2.0.0.9136 (2024-02-01)
+
+- fix: Update naming scheme for BCG calculation in Shiny app, Issue \#87
+- refactor: Update text on BCG calculation pop up in Shiny app, Issue
+  \#88
 
 # BCGcalc 2.0.0.9135 (2024-01-11)
 

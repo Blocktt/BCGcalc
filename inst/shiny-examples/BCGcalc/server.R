@@ -1055,6 +1055,23 @@ shinyServer(function(input, output) {
         names(df_sites)[boo_dup] <- names_old[boo_dup]
       }## IF ~ boo_dup
       
+      # File Size
+      nrow_sites <- nrow(df_sites)
+      if (nrow_sites > 500) {
+        # end process with pop up
+        msg <- paste0("More than 500 sites will cause a timeout on downloading NHD+ and StreamCat data."
+                      , "Your file has "
+                      , nrow_sites
+                      , " records."
+        )
+        shinyalert::shinyalert(title = "Generate Index Class Parameters"
+                               , text = msg
+                               , type = "error"
+                               , closeOnEsc = TRUE
+                               , closeOnClickOutside = TRUE)
+        # validate(msg)
+      }## IF ~ nrow_sites
+      
       ## Calc, 03, Run Function, StreamCat ----
       prog_detail <- "Stream Cat; COMID and elev"
       message(paste0("\n", prog_detail))
@@ -2264,7 +2281,7 @@ shinyServer(function(input, output) {
         
       }## IF ~ input$ExclTaxa
       
-      
+     
       ## Calc, 3, BCG Flag Cols ----
       # get columns from Flags (non-metrics) to carry through
       prog_detail <- "Calculate, Keep BCG Model Columns"
@@ -2333,7 +2350,7 @@ shinyServer(function(input, output) {
       dn_metval <- path_results_sub
       pn_metval <- file.path(dn_metval, fn_metval)
       write.csv(df_metval, pn_metval, row.names = FALSE)
-      
+     
       ## Save Results (BCG) ----
       # Munge
       ## Model and QC Flag metrics only
@@ -2474,19 +2491,19 @@ shinyServer(function(input, output) {
       
       
       # Save, Flags Summary
-      fn_levflags <- paste0(fn_input_base, fn_abr_save, "6levflags.csv")
+      fn_levflags <- paste0(fn_abr_save, "6levflags.csv")
       dn_levflags <- path_results_sub
       pn_levflags <- file.path(dn_levflags, fn_levflags)
       write.csv(df_lev_flags_summ, pn_levflags, row.names = TRUE)
-      
+     
       # Save, Results
-      fn_results <- paste0(fn_input_base, fn_abr_save, "RESULTS.csv")
+      fn_results <- paste0("_", fn_abr_save, "RESULTS.csv")
       dn_results <- path_results_sub
       pn_results <- file.path(dn_results, fn_results)
       write.csv(df_results, pn_results, row.names = FALSE)
       
       # Save, Flag Metrics
-      fn_metflags <- paste0(fn_input_base, fn_abr_save, "6metflags.csv")
+      fn_metflags <- paste0(fn_abr_save, "6metflags.csv")
       dn_metflags <- path_results_sub
       pn_metflags <- file.path(dn_metflags, fn_metflags)
       write.csv(df_metflags, pn_metflags, row.names = FALSE)
@@ -2624,12 +2641,14 @@ shinyServer(function(input, output) {
                                         , TRUE
                                         , FALSE)
       n_bad_any <- sum(df_samp_flags[, "flag"], na.rm = TRUE)
+      
+      n_total <- nrow(df_samp_flags)
 
       # save info
       write.csv(df_samp_flags, file.path("results", "results_BCG", "_BCG_Sample_FLAGS.csv"))
       
       # Inform user about number of samples outside of experience of model
-      msg <- paste0("('NA' if data field not provided in input file).", "\n\n"
+      msg <- paste0(n_total, " = Total number of samples", "\n\n"
                     , n_bad_any, " = Total number of samples outside of model experience", "\n\n"
                     , n_bad_indexclass, " = Index_Class, incorrect (LoGrad-HiElev)", "\n"
                     , n_bad_eco3, " = Ecoregion III, incorrect (not 1, 2, 3, 4, or 77)", "\n"
@@ -2638,7 +2657,8 @@ shinyServer(function(input, output) {
                     , n_bad_wshedarea_large, " = watershed area, large (> 260 km2)", "\n"
                     , n_bad_elev_trans, " = elevation, transitional (700 - 800 m)", "\n"
                     , n_bad_slope_trans, " = slope, transitional (0.8 - 1.2%)", "\n"
-                    , n_bad_slope_vhigh, " = slope, very high (>= 8%)"
+                    , n_bad_slope_vhigh, " = slope, very high (>= 8%)", "\n\n"
+                    , "('NA' if data field not provided in input file)."
                     )
       shinyalert::shinyalert(title = "BCG Calculation,\nSamples Outside Model Experience"
                              , text = msg
@@ -2808,7 +2828,7 @@ shinyServer(function(input, output) {
       ## Calc, 03, MetVal----
       prog_detail <- "Calculate, Metric, Values"
       message(paste0("\n", prog_detail))
-      message(paste0("Community = ", input$si_community))
+      message(paste0("Community = ", input$si_community_met_therm))
       # Increment the progress bar, and update the detail text.
       incProgress(1/prog_n, detail = prog_detail)
       Sys.sleep(prog_sleep)
@@ -3087,7 +3107,7 @@ shinyServer(function(input, output) {
       ## Calc, 4, Rules ----
       prog_detail <- "Calculate, BCG Rules"
       message(paste0("\n", prog_detail))
-      message(paste0("Community = ", input$si_community))
+      message(paste0("Community = ", input$si_community_modtherm))
       # Increment the progress bar, and update the detail text.
       incProgress(1/prog_n, detail = prog_detail)
       Sys.sleep(prog_sleep)
@@ -3100,10 +3120,11 @@ shinyServer(function(input, output) {
       pn_rules <- file.path(dn_rules, fn_rules)
       write.csv(df_rules, pn_rules, row.names = FALSE)
       
+  
       ## Calc, 5, MetVal----
       prog_detail <- "Calculate, Metric, Values"
       message(paste0("\n", prog_detail))
-      message(paste0("Community = ", input$si_community))
+      message(paste0("Community = ", input$si_community_modtherm))
       # Increment the progress bar, and update the detail text.
       incProgress(1/prog_n, detail = prog_detail)
       Sys.sleep(prog_sleep)
@@ -3111,17 +3132,17 @@ shinyServer(function(input, output) {
       # QC
       # df_input <- read.csv(file.path("inst", "extdata", "Data_BCG_PacNW.csv"))
       # df_metval <- BioMonTools::metric.values(df_input, "bugs", boo.Shiny = TRUE)
-      
+    
       if (length(cols_flags_keep) > 0) {
         # keep extra cols from Flags (non-metric)
         df_metval <- BioMonTools::metric.values(df_input
-                                                , input$si_community
+                                                , input$si_community_modtherm
                                                 , fun.cols2keep = cols_flags_keep
                                                 , boo.Shiny = TRUE
                                                 , verbose = TRUE)
       } else {
         df_metval <- BioMonTools::metric.values(df_input
-                                                , input$si_community
+                                                , input$si_community_modtherm
                                                 , boo.Shiny = TRUE
                                                 , verbose = TRUE)
       }## IF ~ length(col_rules_keep)
@@ -3152,7 +3173,7 @@ shinyServer(function(input, output) {
       dn_metval_slim <- path_results_sub
       pn_metval_slim <- file.path(dn_metval_slim, fn_metval_slim)
       write.csv(df_metval_slim, pn_metval_slim, row.names = FALSE)
-      
+
      
       ## Calc, 6, MetMemb----
       prog_detail <- "Calculate, Metric, Membership"
@@ -3168,7 +3189,7 @@ shinyServer(function(input, output) {
       pn_metmemb <- file.path(dn_metmemb, fn_metmemb)
       write.csv(df_metmemb, pn_metmemb, row.names = FALSE)
       
-    
+      
       ## Calc, 7, LevMemb----
       prog_detail <- "Calculate, Level, Membership"
       message(paste0("\n", prog_detail))
@@ -4106,7 +4127,7 @@ shinyServer(function(input, output) {
       df_metric_scores_bugs <- metric.scores(DF_Metrics = df_metric_values_bugs
                                              , col_MetricNames = myMetrics.Bugs
                                              , col_IndexName = "INDEX_NAME"
-                                             , col_IndexRegion = "INDEX_CLASS"
+                                             , col_IndexClass = "INDEX_CLASS"
                                              , DF_Thresh_Metric = df_thresh_metric
                                              , DF_Thresh_Index = df_thresh_index)
       
